@@ -1,0 +1,24 @@
+#!/bin/bash
+#W zadanym drzewie katalogów znaleźć katalogi zawierające mniej niż 
+#$2 (zadany parametr), a więcej lub równo $3 podkatalogi. 
+#Skrypt musi uwzględniać ostrość nierówności!
+
+
+if [ $# -ne 3 ]
+then
+        echo "Niepoprawna liczba argumentów."
+        exit 1
+fi
+
+if [ ! -d $1 ]
+then
+        echo "$1 nie jest katalogiem!"
+      exit 2
+fi
+
+minimum=`expr $3 + 2`
+maksimum=`expr $2 + 2`
+
+find $1 -type d -links +$minimum -or -links $minimum -and -links -$maksimum | sort
+
+exit 0

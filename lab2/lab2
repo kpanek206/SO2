@@ -1,0 +1,39 @@
+#!/bin/bash
+#W zadanym katalogu przerobić wszystkie dowiązania twarde wskazujące na pliki regularne 
+#w tym katalogu – na dowiązania symboliczne (trzeba pozostawić jeden plik/dowiązanie, na który wskażą pozostałe).
+
+#$1 - folder z linkami
+#$2 - folder z danymi
+
+if [ $# -ne 2 ] 
+then
+    echo "Nieprawidłowa liczba argumentow"
+    exit 1
+fi
+
+if [ ! -d $1 ] 
+then
+	echo "Taki folder nie istnieje"
+	exit 2
+fi
+
+if [ ! -d $2 ] 
+then
+	echo "Taki folder nie istnieje"
+	exit 3
+fi
+
+for file in `ls $1`
+do
+	if [ -f $1/$file ] && [ ! -h $1/$file ]  #sprawdza czy plik jest regularny oraz czy nie jest dowiązaniem symbolicznym
+	then
+		for path in `ls $2`
+		do
+			if [ `stat -c '%i' $1/$file` -eq `stat -c '%i' $2/$path` ] #porównanie inode'ów
+			then
+				ln -fs `realpath $2/$path` $1/${file}	#zamiana dowiazania twardego na symboliczne
+				break
+			fi
+		done
+	fi
+done
